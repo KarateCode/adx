@@ -9,7 +9,7 @@ import (
 func TestGetAdgroupCriterion(*testing.T) {
 	adwords := New(AdxPull)
 	
-	data := AdgroupCriterionGetSelector{
+	data := AdgroupCriterionSelector{
 		Fields:   []string{"Id", "Status", "MaxCpm", "AdGroupName"}, 
 		
 		Predicates: []Predicate{

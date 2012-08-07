@@ -6,6 +6,11 @@ import (
 	"net/url"
 	"os"
 	"net/http"
+	"text/template"
+	"bytes"
+	"io"
+	// "os"
+	"encoding/xml"
 )
 
 type Auth struct {
@@ -46,9 +51,16 @@ func init() {
 		Version:        os.Getenv("AdxPullVersion"), 
 		Sandbox:        sandbox,
 	}
+	
+	var err error
+	layout, err = template.New("temp").Parse(layoutString)
+	if err != nil {
+		panic(err)
+	}
 }
 
-var layout = `{{define "T"}}<?xml version="1.0" encoding="UTF-8"?>
+var layout *template.Template
+var layoutString = `{{define "T"}}<?xml version="1.0" encoding="UTF-8"?>
 <soap:Envelope
   xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
   xmlns="https://adwords.google.com/api/adwords/{{.Mcc}}/{{.Auth.Version}}">
@@ -126,4 +138,44 @@ func Authenticate(email, password string) string {
 		}
 	}
 	return authToken
+}
+
+func CallApi(v interface{}, conn *Conn, service string, operation string) (io.ReadCloser, error) {
+	p, err := xml.MarshalIndent(v, "", "	")
+	if err != nil {
+		return nil, err
+	}
+	
+	buffer := bytes.NewBufferString("")
+	execErr := layout.ExecuteTemplate(buffer, "T", data{
+		Auth:       &conn.Auth, 
+		AuthToken:  conn.token, 
+		Body:       string(p), 
+		Mcc:        "cm", 
+		Operation:  operation,
+	})
+	if execErr != nil {
+		return nil, err
+	}
+
+	// io.Copy(os.Stdout, buffer)
+	// return nil, nil
+	
+	req, err := http.NewRequest("POST", 
+		"https://adwords" + conn.sandboxUrl + ".google.com/api/adwords/cm/" + conn.Version + "/" + service, 
+		buffer)
+	if err != nil {
+		return nil, err
+	}
+	
+	req.Header.Add("Content-Type", "application/soap+xml") // VERY IMPORTANT. ADX wouldn't accept xml without it
+	req.Header.Add("Authorization", "GoogleLogin auth=" + conn.token)
+	req.Header.Add("clientCustomerId", conn.Auth.ClientId)
+	req.Header.Add("developerToken", conn.Auth.DeveloperToken)
+	
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	return res.Body, nil
 }

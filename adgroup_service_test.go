@@ -1,7 +1,7 @@
 package adx
 
 import (
-	"fmt"
+	// "fmt"
 	"testing"
 	"time"
 	. "github.com/KarateCode/helpers"
@@ -88,7 +88,7 @@ func TestAddRemoveAdgroup(*testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("\nadcGet%+v\n", adcGet.Body)
+	// fmt.Printf("\nadcGet%+v\n", adcGet.Body)
 	ShouldEqual(1, adcGet.Body.GetResponse.Rval.TotalNumEntries)
 	
 	adgroupId := adcGet.Body.GetResponse.Rval.Entries[0].Id
@@ -114,53 +114,53 @@ func TestAddRemoveAdgroup(*testing.T) {
 	ShouldEqual(0, adcGet.Body.GetResponse.Rval.TotalNumEntries)
 }
 
-// func TestGetAdgroupByCampaign(*testing.T) {
-// 	// 3066697865
-// 	adwords := New(AdxPush)
-// 	data := AdgroupSelector{
-// 		Fields:     []string{"Id", "Status", "MaxCpm", "AdGroupName"}, 
-// 		Predicates: []Predicate{
-// 			Predicate{
-// 				Field:    "CampaignId", 
-// 				Operator: "EQUALS", 
-// 				Values:   []string{"702011"},
-// 			},
-// 			Predicate{
-// 				Field:    "Status", 
-// 				Operator: "NOT_IN", 
-// 				Values:   []string{"DELETED"},
-// 			},
-// 		},
-// 		StartIndex: 0, 
-// 		NumberResults: 5000,
-// 	}
-// 	
-// 	adcGet, err := adwords.AdgroupService.Get(data)
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// 	fmt.Printf("\n\nadcGet%+v\n", adcGet)
-// 	ShouldEqual(1, adcGet.Body.GetResponse.Rval.TotalNumEntries)
-// 	
-// 	removeData := AdgroupOperations{
-// 		Operator:  "SET", 
-// 		Operand: AdgroupOperand{
-// 			Id: 3066697865, 
-// 			CampaignId: 702011, 
-// 			Name: "Sample Adgroup",
-// 			Status: "DELETED",
-// 		},
-// 	}
-// 	adwords.AdgroupService.Mutate(removeData)
-// 	
-// 	
-// 	adcGet, err := adwords.AdgroupService.Get(data)
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// 	
-// 	fmt.Printf("\n\nadcGet%+v\n", adcGet)
-// 	// println(adcGet.Body.GetResponse.Rval.Entries)
-// 	ShouldEqual(0, adcGet.Body.GetResponse.Rval.TotalNumEntries)
-// }
+ // func TestGetAdgroupByCampaign(*testing.T) {
+ // 	// 3066697865
+ // 	adwords := New(AdxPush)
+ // 	data := AdgroupSelector{
+ // 		Fields:     []string{"Id", "Status", "MaxCpm", "AdGroupName"}, 
+ // 		Predicates: []Predicate{
+ // 			Predicate{
+ // 				Field:    "CampaignId", 
+ // 				Operator: "EQUALS", 
+ // 				Values:   []string{"702011"},
+ // 			},
+ // 			Predicate{
+ // 				Field:    "Status", 
+ // 				Operator: "NOT_IN", 
+ // 				Values:   []string{"DELETED"},
+ // 			},
+ // 		},
+ // 		StartIndex: 0, 
+ // 		NumberResults: 5000,
+ // 	}
+ // 	
+ // 	adcGet, err := adwords.AdgroupService.Get(data)
+ // 	if err != nil {
+ // 		panic(err)
+ // 	}
+ // 	fmt.Printf("\n\nadcGet%+v\n", adcGet)
+ // 	ShouldEqual(1, adcGet.Body.GetResponse.Rval.TotalNumEntries)
+ // 	
+ // 	// removeData := AdgroupOperations{
+ // 	// 	Operator:  "SET", 
+ // 	// 	Operand: AdgroupOperand{
+ // 	// 		Id: 3066697865, 
+ // 	// 		CampaignId: 702011, 
+ // 	// 		Name: "Sample Adgroup",
+ // 	// 		Status: "DELETED",
+ // 	// 	},
+ // 	// }
+ // 	// adwords.AdgroupService.Mutate(removeData)
+ // 	// 
+ // 	// 
+ // 	// adcGet, err := adwords.AdgroupService.Get(data)
+ // 	// if err != nil {
+ // 	// 	panic(err)
+ // 	// }
+ // 	// 
+ // 	// fmt.Printf("\n\nadcGet%+v\n", adcGet)
+ // 	// // println(adcGet.Body.GetResponse.Rval.Entries)
+ // 	// ShouldEqual(0, adcGet.Body.GetResponse.Rval.TotalNumEntries)
+ // }
 
