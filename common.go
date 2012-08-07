@@ -51,7 +51,6 @@ func init() {
 var layout = `{{define "T"}}<?xml version="1.0" encoding="UTF-8"?>
 <soap:Envelope
   xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
   xmlns="https://adwords.google.com/api/adwords/{{.Mcc}}/{{.Auth.Version}}">
 	<soap:Header>
 		<RequestHeader>
@@ -72,6 +71,8 @@ type Conn struct {
 	sandboxUrl string
 	CampaignService campaignService
 	ServicedAccountService servicedAccountService
+	AdgroupCriterionService adgroupCriterionService
+	AdgroupService adgroupService
 	token string
 }
 
@@ -79,6 +80,8 @@ func New(auth Auth) (*Conn) {
 	conn := Conn{Auth:auth, token:Authenticate(auth.Email, auth.Password)}
 	conn.CampaignService.conn = &conn
 	conn.ServicedAccountService.conn = &conn
+	conn.AdgroupCriterionService.conn = &conn
+	conn.AdgroupService.conn = &conn
 	
 	if auth.Sandbox {
 		conn.sandboxUrl = "-sandbox"

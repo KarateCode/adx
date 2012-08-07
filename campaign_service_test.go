@@ -28,18 +28,19 @@ func TestGetCampaign(*testing.T) {
 // 	
 // 	data := CampaignMutateOperations{
 // 		Name:                    "Campaign Test 2", 
-// 		Status:                  "PAUSED", 
+// 		// Status:                  "PAUSED", 
 // 		Operator:                "ADD", 
 // 		Period:                  "DAILY",
 // 		MicroAmount:             "1000000000",
 // 		DeliveryMethod:          "STANDARD",
-// 		BiddingStrategy:         BiddingStrategy{XsiType:"ManualCPC"},
-// 		Settings:                Settings{XsiType:"RealTimeBiddingSetting", OptIn:true},
+// 		BiddingStrategy:         BiddingStrategy{XsiType:"cm:ManualCPC"},
+// 		// Settings:                Settings{XsiType:"RealTimeBiddingSetting", OptIn:true},
 // 		// Settings:                Settings{XsiType:"KeywordMatchSetting", OptIn:true},
-// 		TargetGoogleSearch:      false,
-// 		TargetSearchNetwork:     false,
-// 		TargetContentNetwork:    true,
-// 		TargetContentContextual: false,
+// 		// Settings:                Settings{XsiType:"TargetRestrictSetting"},
+// 		// TargetGoogleSearch:      false,
+// 		// TargetSearchNetwork:     false,
+// 		// TargetContentNetwork:    true,
+// 		// TargetContentContextual: false,
 // 	}
 // 	adwords.CampaignService.Mutate(data)
 // }
