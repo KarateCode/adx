@@ -8,11 +8,11 @@ import (
 	// "os"
 )
 
-type conversionTrackerService struct {
+type userListService struct {
 	conn *Conn
 }
 
-type ConversionTrackerSelector struct {
+type UserListSelector struct {
 	XMLName   xml.Name `xml:"serviceSelector"`
 	Fields []string `xml:"fields"`
 	Predicates []Predicate `xml:"predicates"`
@@ -20,7 +20,7 @@ type ConversionTrackerSelector struct {
 	// NumberResults int `xml:"paging>numberResults"`
 }
 
-type ConversionTrackerGet struct {
+type UserListGet struct {
 	XMLName   xml.Name `xml:"Envelope"`
 	Body struct {
 		Fault Fault
@@ -33,21 +33,21 @@ type ConversionTrackerGet struct {
 				Entries []struct {
 					Id int64 `xml:"id"`
 					Name string `xml:"name"`
-					Status string `xml:"status"`
-					Stats struct {
-						Network string `xml:"network"`
-						StatsType string `xml:"Stats.Type"`
-					} `xml:"stats"`
+					// Status string `xml:"status"`
+					// Stats struct {
+					// 	Network string `xml:"network"`
+					// 	StatsType string `xml:"Stats.Type"`
+					// } `xml:"stats"`
 				} `xml:"entries"`
 			} `xml:"rval"`
 		} `xml:"getResponse"`
 	}
 }
 
-func (self *conversionTrackerService) Get(v ConversionTrackerSelector) (*ConversionTrackerGet, error) {
-	dataGet := new(ConversionTrackerGet)
+func (self *userListService) Get(v UserListSelector) (*UserListGet, error) {
+	dataGet := new(UserListGet)
 	
-	returnBody, err := CallApi(v, self.conn, "ConversionTrackerService", "get")
+	returnBody, err := CallApi(v, self.conn, "UserListService", "get")
 	if err != nil {return nil, err}
 	defer returnBody.Close()
 	

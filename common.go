@@ -86,6 +86,7 @@ type Conn struct {
 	AdgroupCriterionService  adgroupCriterionService
 	AdgroupService           adgroupService
 	ConversionTrackerService conversionTrackerService
+	UserListService userListService
 	Token string
 }
 
@@ -120,6 +121,7 @@ func New(auth Auth) (*Conn) {
 	conn.AdgroupCriterionService.conn = &conn
 	conn.AdgroupService.conn = &conn
 	conn.ConversionTrackerService.conn = &conn
+	conn.UserListService.conn = &conn
 	
 	if auth.Sandbox {
 		conn.sandboxUrl = "-sandbox"
