@@ -3,6 +3,7 @@ package adx
 import (
 	// "text/template"
 	"encoding/xml"
+	"errors"
 	// "io"
 	// "os"
 )
@@ -28,6 +29,10 @@ type data struct{
 
 type CampaignGet struct {
 	XMLName   xml.Name `xml:"Envelope"`
+	Fault struct {
+		FaultCode string `xml:"faultcode"`
+		FaultString string `xml:"faultstring"`
+	}
 	Body struct {
 		XMLName   xml.Name `xml:"Body"`
 		GetResponse struct {
@@ -67,6 +72,10 @@ func (self *campaignService) Get(v CampaignGetSelector) (*CampaignGet, error) {
 	decoder := xml.NewDecoder(returnBody)
 	err = decoder.Decode(campaignGet)
 	if err != nil {return nil, err}
+	
+	if campaignGet.Fault.FaultString != "" {
+		return nil, errors.New(campaignGet.Fault.FaultString)
+	}
 	
 	// io.Copy(os.Stdout, returnBody) // uncomment this to view http response. Found a 414 once
 	return campaignGet, nil

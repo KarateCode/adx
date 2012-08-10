@@ -61,39 +61,65 @@ func init() {
 
 var layout *template.Template
 var layoutString = `{{define "T"}}<?xml version="1.0" encoding="UTF-8"?>
-<soap:Envelope
-  xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-  xmlns="https://adwords.google.com/api/adwords/{{.Mcc}}/{{.Auth.Version}}">
-	<soap:Header>
-		<RequestHeader>
+<env:Envelope 
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:wsdl="https://adwords.google.com/api/adwords/cm/{{.Auth.Version}}" xmlns:env="http://schemas.xmlsoap.org/soap/envelope/">
+	<env:Header>
+		<wsdl:RequestHeader xmlns="https://adwords.google.com/api/adwords/cm/{{.Auth.Version}}">
 			<userAgent>golang|adx</userAgent>
 			<developerToken>{{.Auth.DeveloperToken}}</developerToken>
 			<clientCustomerId>{{.Auth.ClientId}}</clientCustomerId>
 			<authToken>{{.AuthToken}}</authToken>
-		</RequestHeader>
-	</soap:Header>
-	<soap:Body>
-		<{{.Operation}}>{{.Body}}
+		</wsdl:RequestHeader>
+	</env:Header>
+	<env:Body>
+		<{{.Operation}} xmlns="https://adwords.google.com/api/adwords/{{.Mcc}}/{{.Auth.Version}}">{{.Body}}
 		</{{.Operation}}>
-	</soap:Body>
-</soap:Envelope>{{end}}`
+	</env:Body>
+</env:Envelope>{{end}}`
 
 type Conn struct {
 	Auth
 	sandboxUrl string
-	CampaignService campaignService
-	ServicedAccountService servicedAccountService
-	AdgroupCriterionService adgroupCriterionService
-	AdgroupService adgroupService
-	token string
+	CampaignService          campaignService
+	ServicedAccountService   servicedAccountService
+	AdgroupCriterionService  adgroupCriterionService
+	AdgroupService           adgroupService
+	ConversionTrackerService conversionTrackerService
+	Token string
+}
+
+type Fault struct {
+	XMLName   xml.Name
+	FaultCode string `xml:"faultcode"`
+	FaultString string `xml:"faultstring"`
+}
+
+type MutateResponse struct {
+	XMLName   xml.Name `xml:"Envelope"`
+	Body struct {
+		Fault Fault
+	}
+}
+
+type Ordering struct {
+	Field string `xml:"field"`
+	SortOrder string `xml:"sortOrder"`
+}
+
+type Predicate struct {
+	Field string `xml:"field"`
+	Operator string `xml:"operator"`
+	Values []string `xml:"values"`
 }
 
 func New(auth Auth) (*Conn) {
-	conn := Conn{Auth:auth, token:Authenticate(auth.Email, auth.Password)}
+	conn := Conn{Auth:auth, Token:Authenticate(auth.Email, auth.Password)}
 	conn.CampaignService.conn = &conn
 	conn.ServicedAccountService.conn = &conn
 	conn.AdgroupCriterionService.conn = &conn
 	conn.AdgroupService.conn = &conn
+	conn.ConversionTrackerService.conn = &conn
 	
 	if auth.Sandbox {
 		conn.sandboxUrl = "-sandbox"
@@ -141,7 +167,8 @@ func Authenticate(email, password string) string {
 }
 
 func CallApi(v interface{}, conn *Conn, service string, operation string) (io.ReadCloser, error) {
-	p, err := xml.MarshalIndent(v, "", "	")
+	p, err := xml.Marshal(v)
+	// p, err := xml.MarshalIndent(v, "", "	")
 	if err != nil {
 		return nil, err
 	}
@@ -149,8 +176,9 @@ func CallApi(v interface{}, conn *Conn, service string, operation string) (io.Re
 	buffer := bytes.NewBufferString("")
 	execErr := layout.ExecuteTemplate(buffer, "T", data{
 		Auth:       &conn.Auth, 
-		AuthToken:  conn.token, 
+		AuthToken:  conn.Token, 
 		Body:       string(p), 
+		// Body:       body, 
 		Mcc:        "cm", 
 		Operation:  operation,
 	})
@@ -161,15 +189,13 @@ func CallApi(v interface{}, conn *Conn, service string, operation string) (io.Re
 	// io.Copy(os.Stdout, buffer)
 	// return nil, nil
 	
-	req, err := http.NewRequest("POST", 
-		"https://adwords" + conn.sandboxUrl + ".google.com/api/adwords/cm/" + conn.Version + "/" + service, 
-		buffer)
+	req, err := http.NewRequest("POST", "https://adwords" + conn.sandboxUrl + ".google.com/api/adwords/cm/" + conn.Version + "/" + service, buffer)
 	if err != nil {
 		return nil, err
 	}
 	
 	req.Header.Add("Content-Type", "application/soap+xml") // VERY IMPORTANT. ADX wouldn't accept xml without it
-	req.Header.Add("Authorization", "GoogleLogin auth=" + conn.token)
+	req.Header.Add("Authorization", "GoogleLogin auth=" + conn.Token)
 	req.Header.Add("clientCustomerId", conn.Auth.ClientId)
 	req.Header.Add("developerToken", conn.Auth.DeveloperToken)
 	

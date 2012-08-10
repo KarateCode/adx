@@ -19,6 +19,7 @@ func TestGetCampaign(*testing.T) {
 	if err != nil {
 		panic(err)
 	}
+	
 	ShouldEqual(1, len(campaignGet.Body.GetResponse.Rval.Entries))
 	ShouldEqual("Hello World! with cURL", campaignGet.Body.GetResponse.Rval.Entries[0].Name)
 }

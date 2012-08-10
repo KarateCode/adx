@@ -83,7 +83,7 @@ func (self *servicedAccountService) Get(v ServicedAccountGetSelector) (*[]Accoun
 	}
 	
 	buffer := bytes.NewBufferString("")
-	execErr := tmp.ExecuteTemplate(buffer, "T", data{Auth:&self.conn.Auth, AuthToken:self.conn.token, Body:string(p), Mcc:"mcm", Operation:"get"})
+	execErr := tmp.ExecuteTemplate(buffer, "T", data{Auth:&self.conn.Auth, AuthToken:self.conn.Token, Body:string(p), Mcc:"mcm", Operation:"get"})
 	if execErr != nil {
 		return nil, nil, execErr
 	}
@@ -100,7 +100,7 @@ func (self *servicedAccountService) Get(v ServicedAccountGetSelector) (*[]Accoun
 	}
 	
 	req.Header.Add("Content-Type", "application/soap+xml") // VERY IMPORTANT. ADX wouldn't accept xml without it
-	req.Header.Add("Authorization", "GoogleLogin auth=" + self.conn.token)
+	req.Header.Add("Authorization", "GoogleLogin auth=" + self.conn.Token)
 	req.Header.Add("clientCustomerId", self.conn.Auth.ClientId)
 	req.Header.Add("developerToken", self.conn.Auth.DeveloperToken)
 	
