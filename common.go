@@ -73,8 +73,7 @@ var layoutString = `{{define "T"}}<?xml version="1.0" encoding="UTF-8"?>
 		</wsdl:RequestHeader>
 	</env:Header>
 	<env:Body>
-		<{{.Operation}} xmlns="https://adwords.google.com/api/adwords/{{.Mcc}}/{{.Auth.Version}}">{{.Body}}
-		</{{.Operation}}>
+		<{{.Operation}} xmlns="https://adwords.google.com/api/adwords/{{.Mcc}}/{{.Auth.Version}}">{{.Body}}</{{.Operation}}>
 	</env:Body>
 </env:Envelope>{{end}}`
 
@@ -86,7 +85,8 @@ type Conn struct {
 	AdgroupCriterionService  adgroupCriterionService
 	AdgroupService           adgroupService
 	ConversionTrackerService conversionTrackerService
-	UserListService userListService
+	UserListService          userListService
+	ConstantDataService      constantDataService
 	Token string
 }
 
@@ -104,8 +104,8 @@ type MutateResponse struct {
 }
 
 type Ordering struct {
-	Field string `xml:"field"`
-	SortOrder string `xml:"sortOrder"`
+	Field string `xml:"ordering>field"`
+	SortOrder string `xml:"ordering>sortOrder,omitempty"`
 }
 
 type Predicate struct {
@@ -122,6 +122,7 @@ func New(auth Auth) (*Conn) {
 	conn.AdgroupService.conn = &conn
 	conn.ConversionTrackerService.conn = &conn
 	conn.UserListService.conn = &conn
+	conn.ConstantDataService.conn = &conn
 	
 	if auth.Sandbox {
 		conn.sandboxUrl = "-sandbox"
@@ -174,6 +175,8 @@ func CallApi(v interface{}, conn *Conn, service string, operation string) (io.Re
 	if err != nil {
 		return nil, err
 	}
+	
+	// println(string(p) + "\n")
 	
 	buffer := bytes.NewBufferString("")
 	execErr := layout.ExecuteTemplate(buffer, "T", data{

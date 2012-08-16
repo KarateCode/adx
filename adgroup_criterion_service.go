@@ -4,6 +4,8 @@ import (
 	// "fmt"
 	// "text/template"
 	"encoding/xml"
+	"strconv"
+	"errors"
 	// "io"
 	// "os"
 )
@@ -23,6 +25,14 @@ type AdgroupCriterionSelector struct {
 	StartIndex int `xml:"paging>startIndex"`
 	NumberResults int `xml:"paging>numberResults"`
 }
+
+// type MaxCpm struct {
+// 	Amount Amount `xml:"amount,omitempty"`
+// }
+
+// type Amount struct {
+// 	MicroAmount int64 `xml:"microAmount,omitempty"`
+// }
 
 type AdgroupCriterionGet struct {
 	XMLName   xml.Name `xml:"Envelope"`
@@ -48,10 +58,14 @@ type AdgroupCriterionGet struct {
 						Type string `xml:"type"`
 					} `xml:"criterion"`
 					UserStatus string `xml:"userStatus"`
-					// CampaignStats struct {
-					// 	network string `xml:"network"`
-					// 	StatsType string `xml:"Stats.Type"`
-					// } `xml:"campaignStats"`
+					// Bids Bids `xml:"bids,omitempty"`
+					Bids struct {
+						MaxCpm struct {
+							Amount struct {
+								MicroAmount int64 `xml:"microAmount"`
+							} `xml:"amount"`
+						} `xml:"maxCpm"`
+					} `xml:"bids"`
 					// FrequencyCap struct {
 					// 	Impressions int64 `xml:"impressions"`
 					// } `xml:"frequencyCap"`
@@ -79,13 +93,30 @@ func (self *adgroupCriterionService) Get(v AdgroupCriterionSelector) (*AdgroupCr
 	return adgroupGet, nil
 }
 
+type Bids struct {
+	XMLName   xml.Name `xml:"bids,omitempty"`
+	XsiType   string `xml:"xsi:type,attr,omitempty"`
+	// MaxCpm int64 `xml:"maxCpm,omitempty>amount,omitempty>microAmount,omitempty"`
+	MaxCpm int64 `xml:"-"`
+	InnerBid string `xml:",innerxml"`
+	// MaxCpm MaxCpm `xml:"maxCpm,omitempty"`
+	// AdGroupCriterionBidsType string `xml:"AdGroupCriterionBids.Type"`
+}
+
 type AdgroupCriterionOperand struct {
 	// Id int64 `xml:"id"`
 	XsiType   string `xml:"xsi:type,attr"`
 	AdgroupId int64 `xml:"adGroupId"`
 	// CriterionUse string `xml:"criterionUse"`
 	Criterion Criterion `xml:"criterion"`
-	// UserStatus string `xml:"userStatus"`
+	UserStatus string `xml:"userStatus,omitempty"`
+	Bids Bids `xml:"-"`
+	InnerXmlBids string `xml:",innerxml"`
+	// Bids struct {
+		// BidsXsiType   string `xml:"bids>xsi:type,attr,omitempty"`
+		// XsiType   string `xml:"xsi:type,attr,omitempty"`
+		// MaxCpm int64 `xml:"bids,omitempty>amount,omitempty>microAmount,omitempty>maxCpm,omitempty"`
+	// } `xml:"bids,omitempty"`
 }
 
 type Criterion struct {
@@ -121,12 +152,25 @@ func (self *adgroupCriterionService) Mutate(v AdgroupCriterionOperations) error 
 	// v.BiddingStrategy.Xsi = "http://www.w3.org/2001/XMLSchema-instance"
 	// v := servicedAccountServiceGet{EnablePaging:false, SubmanagersOnly:false}
 	// println("Where's my mutate?")
+	adgroupMutate := new(MutateResponse)
+	
+	if v.Operand.Bids.MaxCpm != 0 {
+		v.Operand.InnerXmlBids = `<bids xsi:type="` + v.Operand.Bids.XsiType + `"><maxCpm><amount><microAmount>` + strconv.FormatInt(v.Operand.Bids.MaxCpm, 10) + `</microAmount></amount></maxCpm></bids>`
+	}
 	
 	returnBody, err := CallApi(v, self.conn, "AdGroupCriterionService", "mutate")
 	if err != nil {return err}
 	defer returnBody.Close()
 	
+	decoder := xml.NewDecoder(returnBody)
+	err = decoder.Decode(adgroupMutate)
+	if err != nil {return err}
+	// fmt.Printf("\nadgroupMutate%+v\n", adgroupMutate)
+	
+	if adgroupMutate.Body.Fault.FaultString != "" {
+		return errors.New(adgroupMutate.Body.Fault.FaultString)
+	}
 	// io.Copy(os.Stdout, returnBody) // uncomment this to view http response. Found a 414 once
+	// println("mutate done")
 	return nil
 }
-

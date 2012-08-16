@@ -37,12 +37,75 @@ func TestGetAdgroupCriterion(*testing.T) {
 	}
 	
 	// fmt.Printf("\nadcGet%+v\n", adcGet.Body.GetResponse.Rval.Entries[0])
-	// println(adcGet.Body.GetResponse.Rval.Entries)
 	ShouldEqual(1, adcGet.Body.GetResponse.Rval.TotalNumEntries)
 }
 
+func TestSetMaxCpm(*testing.T) {
+	adwords := New(AdxPull)
+	
+	// Update placement
+	createData := AdgroupCriterionOperations{
+		Operator: "SET", 
+		Operand: AdgroupCriterionOperand{
+			XsiType: "BiddableAdGroupCriterion",
+			AdgroupId: 2765812624,
+			// CriterionUse: "BIDDABLE",
+			Criterion: Criterion{
+				// Type: "VERTICAL", 
+				Id: 5012832132,
+				// Type: "Placement", 
+				// Url: "http://pluto.google.com",
+			},
+			UserStatus: "ACTIVE",
+			Bids: Bids{
+				XsiType: "ManualCPMAdGroupCriterionBids",
+				// BidsXsiType: "ManualCPMAdGroupCriterionBids",
+				MaxCpm: 320000,
+				// MaxCpm: MaxCpm{Amount: Amount{MicroAmount:320000}},
+			},
+		},
+	}
+	
+	// for i := 0; i<20; i++ {  // Why doesn't this cause a RATE EXCEEDED error?
+		if err := adwords.AdgroupCriterionService.Mutate(createData); err != nil {
+			panic(err)
+		}
+	// }
+	
+	
+	// Read placement
+	data := AdgroupCriterionSelector{
+		Fields:   []string{"Id", "Status", "MaxCpm", "AdGroupName"}, 
+		
+		Predicates: []Predicate{
+			Predicate{
+				Field:    "AdGroupId", 
+				Operator: "IN", 
+				Values:   []string{"2765812624"},
+			},
+			Predicate{
+				Field:    "Id", // It's a vertical ID
+				Operator: "IN", 
+				Values:   []string{"5012832132"}, 
+			},
+		},
+		
+		StartIndex: 0, 
+		NumberResults: 5000,
+	}
+	adcGet, err := adwords.AdgroupCriterionService.Get(data)
+	if err != nil {
+		panic(err)
+	}
+	
+	// fmt.Printf("\nadcGet%+v\n", adcGet.Body.GetResponse.Rval.Entries[0])
+	ShouldEqual(1, adcGet.Body.GetResponse.Rval.TotalNumEntries)
+	ShouldEqual("ACTIVE", adcGet.Body.GetResponse.Rval.Entries[0].UserStatus)
+	// ShouldEqual(int64(320000), adcGet.Body.GetResponse.Rval.Entries[0].Bids.MaxCpm)
+	ShouldEqual(int64(320000), adcGet.Body.GetResponse.Rval.Entries[0].Bids.MaxCpm.Amount.MicroAmount)
+}
+
 func TestAddRemoveAdgroupCriterion(*testing.T) {
-	// println("Testing AdgroupCriterion")
 	adwords := New(AdxPush)
 	adgroupName := `Sample Adgroup ` + time.Now().String()
 	var adcGet *AdgroupGet
@@ -115,7 +178,11 @@ func TestAddRemoveAdgroupCriterion(*testing.T) {
 				Url: "http://mars.google.com",
 				// MatchType: "EXACT",
 			},
-			// UserStatus: "ACTIVE",
+			UserStatus: "ACTIVE",
+			// Bids: Bids{
+				// XsiType: "ManualCPMAdGroupCriterionBids",
+				// MaxCpm: MaxCpm{Amount: Amount{MicroAmount:250000}},
+			// },
 		},
 	}
 	if err = adwords.AdgroupCriterionService.Mutate(createData); err != nil {
@@ -241,7 +308,6 @@ func TestAddRemoveAdgroupCriterion(*testing.T) {
 	}
 	// fmt.Printf("\nadcGet%+v\n", adcGet.Body)
 	ShouldEqual(0, adcGet.Body.GetResponse.Rval.TotalNumEntries)
-	// println("Testing AdgroupCriterion complete")
 }
 
 // func TestRetrieveAdgroupCriterion(*testing.T) {

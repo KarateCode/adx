@@ -2,8 +2,8 @@ package adx
 
 import (
 	// "fmt"
-	"io"
-	"os"
+	// "io"
+	// "os"
 	"errors"
 	// "bytes"
 	// "io/ioutil"
@@ -29,7 +29,8 @@ type AdgroupSelector struct {
 	// Operator string `xml:"predicates>operator"`
 	// Values []string `xml:"predicates>values"`
 	Predicates []Predicate `xml:"predicates"`
-	Ordering Ordering `xml:"ordering"`
+	// Ordering Ordering `xml:"ordering,omitempty"`
+	Ordering
 	StartIndex int `xml:"paging>startIndex"`
 	NumberResults int `xml:"paging>numberResults"`
 }
@@ -123,7 +124,6 @@ func (self *adgroupService) Mutate(v AdgroupOperations) error {
 		return errors.New(adgroupMutate.Body.Fault.FaultString)
 	}
 	
-	io.Copy(os.Stdout, returnBody) // uncomment this to view http response. Found a 414 once
+	// io.Copy(os.Stdout, returnBody) // uncomment this to view http response. Found a 414 once
 	return nil
 }
-

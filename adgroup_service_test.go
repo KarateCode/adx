@@ -41,8 +41,6 @@ func TestGetAdgroup(*testing.T) {
 }
 
 func TestAddRemoveAdgroups(*testing.T) {
-	// println("Testing Adgroup")
-	
 	AdxPush.Version = "v201109"
 	adwords := New(AdxPush)
 	adgroupName := `Sample Adgroup ` + time.Now().String()
@@ -124,7 +122,6 @@ func TestAddRemoveAdgroups(*testing.T) {
 	}
 	// fmt.Printf("\nadcGet%+v\n", adcGet.Body)
 	ShouldEqual(0, adcGet.Body.GetResponse.Rval.TotalNumEntries)
-	// println("Testing Adgroup Complete")
 }
 
 // func TestRemoveAdgroupUtility(*testing.T) {
