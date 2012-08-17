@@ -87,6 +87,7 @@ type Conn struct {
 	ConversionTrackerService conversionTrackerService
 	UserListService          userListService
 	ConstantDataService      constantDataService
+	BulkMutateJobService     bulkMutateJobService
 	Token string
 }
 
@@ -116,13 +117,14 @@ type Predicate struct {
 
 func New(auth Auth) (*Conn) {
 	conn := Conn{Auth:auth, Token:Authenticate(auth.Email, auth.Password)}
-	conn.CampaignService.conn = &conn
-	conn.ServicedAccountService.conn = &conn
-	conn.AdgroupCriterionService.conn = &conn
-	conn.AdgroupService.conn = &conn
+	conn.CampaignService.conn          = &conn
+	conn.ServicedAccountService.conn   = &conn
+	conn.AdgroupCriterionService.conn  = &conn
+	conn.AdgroupService.conn           = &conn
 	conn.ConversionTrackerService.conn = &conn
-	conn.UserListService.conn = &conn
-	conn.ConstantDataService.conn = &conn
+	conn.UserListService.conn          = &conn
+	conn.ConstantDataService.conn      = &conn
+	conn.BulkMutateJobService.conn     = &conn
 	
 	if auth.Sandbox {
 		conn.sandboxUrl = "-sandbox"
