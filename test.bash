@@ -9,6 +9,7 @@ go test -run TestAddRemoveAdgroupCriterion
 go test -run TestGetAdgroup
 go test -run TestAddRemoveAdgroups
 go test -run TestGetBulkMutateJob
+go test -run TestGetResultBulkMutateJob
 go test -run TestAddRemoveBulkMutateJob
 go test -run TestGetCampaign
 go test -run TestDecodingSoapFault

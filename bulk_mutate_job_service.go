@@ -33,24 +33,41 @@ type BulkMutateJobGet struct {
 				// XMLName   xml.Name
 				Id           int64  `xml:"id"`
 				Status       string `xml:"status"`
-				// TotalNumEntries int `xml:"totalNumEntries"`
-				// Entries []struct {
-				// 	Id int64 `xml:"id,omitempty"`
-				// 	Name string `xml:"name"`
-				// 	CampaignId int64 `xml:"campaignId"`
-				// 	CampaignName string `xml:"campaignName"`
-				// 	Status string `xml:"status"`
-				// 	Bids struct {
-				// 		AdGroupBidsType string `xml:"AdGroupBids.Type"`	
-				// 		EnhancedCpcEnabled bool `xml:"enhancedCpcEnabled"`
-				// 	} `xml:"bids"`
-				// 	Stats struct {
-				// 		Network string `xml:"network"`
-				// 		StatsType string `xml:"Stats.Type"`
-				// 	} `xml:"stats"`
-				// } `xml:"entries"`
 			} `xml:"rval"`
 		} `xml:"getResponse"`
+	}
+}
+
+type BulkMutateJobGetResult struct {
+	XMLName   xml.Name `xml:"Envelope"`
+	Body struct {
+		Fault Fault
+		XMLName   xml.Name
+		GetResultResponse struct {
+			// XMLName   xml.Name `xml:"getResponse"`
+			Rval struct {
+				SimpleMutateResult struct {
+					// XMLName   xml.Name
+					Id           int64  `xml:"id"`
+					Status       string `xml:"status"`
+					// TotalNumEntries int `xml:"totalNumEntries"`
+					Results []struct {
+						PlaceHolder string `xml:"PlaceHolder"`
+						// Bids struct {
+						// 	AdGroupBidsType string `xml:"AdGroupBids.Type"`	
+						// 	EnhancedCpcEnabled bool `xml:"enhancedCpcEnabled"`
+						// } `xml:"bids"`
+					} `xml:"results"`
+					Errors []struct {
+						FieldPath    string `xml:"fieldPath"`
+						Trigger      string `xml:"trigger"`
+						ErrorString  string `xml:"errorString"`
+						ApiErrorType string `xml:"ApiError.Type"`
+						Reason       string `xml:"reason"`
+					} `xml:"errors"`
+				} `xml:"SimpleMutateResult"`
+			} `xml:"rval"`
+		} `xml:"getResultResponse"`
 	}
 }
 
@@ -58,6 +75,31 @@ func (self *bulkMutateJobService) Get(v BulkMutateJobSelector) (*BulkMutateJobGe
 	adgroupGet := new(BulkMutateJobGet)
 	
 	returnBody, err := CallApi(v, self.conn, "MutateJobService", "get")
+	if err != nil {return nil, err}
+	defer returnBody.Close()
+	
+	// io.Copy(os.Stdout, returnBody)
+	
+	// ba, err := ioutil.ReadAll(returnBody)
+	// if err != nil { panic(err)}
+	// println(string(ba))
+	// decoder := xml.NewDecoder(bytes.NewBufferString(string(ba)))
+	
+	decoder := xml.NewDecoder(returnBody)
+	err = decoder.Decode(adgroupGet)
+	if err != nil {return nil, err}
+	
+	if adgroupGet.Body.Fault.FaultString != "" {
+		return nil, errors.New(adgroupGet.Body.Fault.FaultString)
+	}
+	// fmt.Printf("\nadgroupGet from AdgroupService %+v\n", adgroupGet)
+	return adgroupGet, nil
+}
+
+func (self *bulkMutateJobService) GetResult(v BulkMutateJobSelector) (*BulkMutateJobGetResult, error) {
+	adgroupGet := new(BulkMutateJobGetResult)
+	
+	returnBody, err := CallApi(v, self.conn, "MutateJobService", "getResult")
 	if err != nil {return nil, err}
 	defer returnBody.Close()
 	

@@ -25,6 +25,28 @@ func TestGetBulkMutateJob(*testing.T) {
 	ShouldEqual("COMPLETED", adcGet.Body.GetResponse.Rval.Status)
 }
 
+func TestGetResultBulkMutateJob(*testing.T) {
+	adwords := New(AdxPush)
+	
+	data := BulkMutateJobSelector{
+		XsiType: "BulkMutateJobSelector",
+		JobIds: []int64{8962009750808307540},
+	}
+	
+	adcGet, err := adwords.BulkMutateJobService.GetResult(data)
+	if err != nil {
+		panic(err)
+	}
+	
+	// fmt.Printf("\nadcGet%+v\n", adcGet)
+	// for _, v := range adcGet.Body.GetResultResponse.Rval.SimpleMutateResult.Errors {
+	// 	println("reason: ", v.Reason, "trigger: ", v.Trigger, "field path: ", v.FieldPath)
+	// }
+	
+	ShouldEqual(20, len(adcGet.Body.GetResultResponse.Rval.SimpleMutateResult.Results))
+	ShouldEqual(20, len(adcGet.Body.GetResultResponse.Rval.SimpleMutateResult.Errors))
+}
+
 
 func TestAddRemoveBulkMutateJob(*testing.T) {
 	// AdxPush.Version = "v201109"
