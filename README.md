@@ -66,7 +66,7 @@ AdxPushEmail
 AdxPushPassword
 AdxPushVersion
 
-To make sure these are set, I'd recommend setting like this in your .bashrc or .bash_profile:
+To make sure these are set, I'd recommend adding lines like this to your .bashrc or .bash_profile:
   
 ```sh
 export AdxPushEmail=youremail
