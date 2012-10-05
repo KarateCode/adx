@@ -20,6 +20,16 @@ type ConversionTrackerSelector struct {
 	// NumberResults int `xml:"paging>numberResults"`
 }
 
+type ConversionTrackerEntry struct {
+	Id int64 `xml:"id"`
+	Name string `xml:"name"`
+	Status string `xml:"status"`
+	Stats struct {
+		Network string `xml:"network"`
+		StatsType string `xml:"Stats.Type"`
+	} `xml:"stats"`
+}
+
 type ConversionTrackerGet struct {
 	XMLName   xml.Name `xml:"Envelope"`
 	Body struct {
@@ -30,15 +40,7 @@ type ConversionTrackerGet struct {
 			Rval struct {
 				// XMLName   xml.Name
 				TotalNumEntries int `xml:"totalNumEntries"`
-				Entries []struct {
-					Id int64 `xml:"id"`
-					Name string `xml:"name"`
-					Status string `xml:"status"`
-					Stats struct {
-						Network string `xml:"network"`
-						StatsType string `xml:"Stats.Type"`
-					} `xml:"stats"`
-				} `xml:"entries"`
+				Entries []ConversionTrackerEntry `xml:"entries"`
 			} `xml:"rval"`
 		} `xml:"getResponse"`
 	}

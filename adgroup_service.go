@@ -35,6 +35,22 @@ type AdgroupSelector struct {
 	NumberResults int `xml:"paging>numberResults"`
 }
 
+type AdgroupEntry struct {
+	Id int64 `xml:"id"`
+	Name string `xml:"name"`
+	CampaignId int64 `xml:"campaignId"`
+	CampaignName string `xml:"campaignName"`
+	Status string `xml:"status"`
+	Bids struct {
+		AdGroupBidsType string `xml:"AdGroupBids.Type"`	
+		EnhancedCpcEnabled bool `xml:"enhancedCpcEnabled"`
+	} `xml:"bids"`
+	Stats struct {
+		Network string `xml:"network"`
+		StatsType string `xml:"Stats.Type"`
+	} `xml:"stats"`
+}
+
 type AdgroupGet struct {
 	XMLName   xml.Name `xml:"Envelope"`
 	Body struct {
@@ -45,21 +61,7 @@ type AdgroupGet struct {
 			Rval struct {
 				// XMLName   xml.Name
 				TotalNumEntries int `xml:"totalNumEntries"`
-				Entries []struct {
-					Id int64 `xml:"id"`
-					Name string `xml:"name"`
-					CampaignId int64 `xml:"campaignId"`
-					CampaignName string `xml:"campaignName"`
-					Status string `xml:"status"`
-					Bids struct {
-						AdGroupBidsType string `xml:"AdGroupBids.Type"`	
-						EnhancedCpcEnabled bool `xml:"enhancedCpcEnabled"`
-					} `xml:"bids"`
-					Stats struct {
-						Network string `xml:"network"`
-						StatsType string `xml:"Stats.Type"`
-					} `xml:"stats"`
-				} `xml:"entries"`
+				Entries []AdgroupEntry `xml:"entries"`
 			} `xml:"rval"`
 		} `xml:"getResponse"`
 	}

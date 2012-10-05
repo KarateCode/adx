@@ -20,6 +20,11 @@ type UserListSelector struct {
 	// NumberResults int `xml:"paging>numberResults"`
 }
 
+type UserListEntry struct {
+	Id int64 `xml:"id"`
+	Name string `xml:"name"`
+}
+
 type UserListGet struct {
 	XMLName   xml.Name `xml:"Envelope"`
 	Body struct {
@@ -30,15 +35,7 @@ type UserListGet struct {
 			Rval struct {
 				// XMLName   xml.Name
 				TotalNumEntries int `xml:"totalNumEntries"`
-				Entries []struct {
-					Id int64 `xml:"id"`
-					Name string `xml:"name"`
-					// Status string `xml:"status"`
-					// Stats struct {
-					// 	Network string `xml:"network"`
-					// 	StatsType string `xml:"Stats.Type"`
-					// } `xml:"stats"`
-				} `xml:"entries"`
+				Entries []UserListEntry `xml:"entries"`
 			} `xml:"rval"`
 		} `xml:"getResponse"`
 	}
