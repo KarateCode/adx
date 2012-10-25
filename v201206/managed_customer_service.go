@@ -4,18 +4,19 @@ import (
 	"text/template"
 	"bytes"
 	"encoding/xml"
-	// "io"
-	// "os"
+	"io"
+	"os"
 	"net/http"
 	"github.com/KarateCode/adx"
 )
 
-type servicedAccountService adx.Conn
+type managedCustomerService adx.Conn
 
-type ServicedAccountGetSelector struct {
-	XMLName   xml.Name `xml:"selector"`
+type ManagedCustomerGetSelector struct {
+	XMLName   xml.Name `xml:"serviceSelector"`
+	Fields []string `xml:"fields"`
 	// XsiType   string `xml:"xsi:type,attr"`
-	CustomerIds []int `xml:"customerIds"`
+	// CustomerIds []int `xml:"customerIds"`
 	EnablePaging bool `xml:"enablePaging"`
 	SubmanagersOnly bool `xml:"submanagersOnly"`
 }
@@ -26,19 +27,20 @@ var mccLayout = `{{define "T"}}<?xml version="1.0" encoding="UTF-8"?>
 		xmlns:wsdl="https://adwords.google.com/api/adwords/mcm/{{.Auth.Version}}" 
 		xmlns:env="http://schemas.xmlsoap.org/soap/envelope/">
 	<env:Header>
-		<wsdl:RequestHeader xmlns="https://adwords.google.com/api/adwords/cm/{{.Auth.Version}}">
+		<wsdl:RequestHeader xmlns="https://adwords.google.com/api/adwords/cm/v201206">
 			<userAgent>AwApi-Ruby-0.4.3|central</userAgent>
 			<developerToken>{{.Auth.DeveloperToken}}</developerToken>
 			<authToken>{{.AuthToken}}</authToken>
 		</wsdl:RequestHeader>
 	</env:Header>
 	<env:Body>
-		<get xmlns="https://adwords.google.com/api/adwords/mcm/{{.Auth.Version}}">{{.Body}}
+		<get xmlns="https://adwords.google.com/api/adwords/mcm/v201206">{{.Body}}
 		</get>
 	</env:Body>
 </env:Envelope>{{end}}`
 
-type Account struct {
+type Entry struct {
+	Name string `xml:"name"`
 	CustomerId int64 `xml:"customerId"`
 	Login string `xml:"login"`
 	CompanyName string `xml:"companyName"`
@@ -53,7 +55,7 @@ type Link struct {
 	// LinkType bool `xml:"Link.Type"`
 }
 
-type ServicedAccountServiceGet struct {
+type ManagedCustomerServiceGet struct {
 	XMLName   xml.Name `xml:"Envelope"`
 	Body struct {
 		XMLName   xml.Name `xml:"Body"`
@@ -61,15 +63,16 @@ type ServicedAccountServiceGet struct {
 			XMLName   xml.Name `xml:"getResponse"`
 			Rval struct {
 				XMLName   xml.Name `xml:"rval"`
-				Accounts []Account `xml:"accounts"`
+				Entries []Entry `xml:"entries"`
+				// Accounts []Account `xml:"accounts"`
 				Links []Link `xml:"links"`
 			}
 		}
 	}
 }
 
-func (self *servicedAccountService) Get(v ServicedAccountGetSelector) (*[]Account, *[]Link, error) {
-	sasGet := new(ServicedAccountServiceGet)
+func (self *managedCustomerService) Get(v ManagedCustomerGetSelector) (*[]Entry, *[]Link, error) {
+	sasGet := new(ManagedCustomerServiceGet)
 		
 	tmp, err := template.New("temp").Parse(mccLayout)
 	if err != nil {
@@ -88,11 +91,11 @@ func (self *servicedAccountService) Get(v ServicedAccountGetSelector) (*[]Accoun
 	}
 
 	// io.Copy(os.Stdout, buffer)
-	// return nil, nil
+	// return nil, nil, nil
 	
-	// service doesn't exist in v201206
+	println("https://adwords" + self.SandboxUrl + ".google.com/api/adwords/mcm/v201206/ManagedCustomerService")
 	req, err := http.NewRequest("POST", 
-		"https://adwords" + self.SandboxUrl + ".google.com/api/adwords/mcm/v201109/ServicedAccountService", 
+		"https://adwords" + self.SandboxUrl + ".google.com/api/adwords/mcm/v201206/ManagedCustomerService", 
 		buffer)
 	if err != nil {
 		return nil, nil, err
@@ -109,7 +112,7 @@ func (self *servicedAccountService) Get(v ServicedAccountGetSelector) (*[]Accoun
 	}
 	defer res.Body.Close()
 	
-	// io.Copy(os.Stdout, res.Body) // uncomment this to view http response. Found a 414 once
+	io.Copy(os.Stdout, res.Body) // uncomment this to view http response. Found a 414 once
 	// return sasGet, nil
 	
 	decoder := xml.NewDecoder(res.Body)
@@ -119,6 +122,6 @@ func (self *servicedAccountService) Get(v ServicedAccountGetSelector) (*[]Accoun
 		return nil, nil, err
 	}
 	
-	return &sasGet.Body.GetResponse.Rval.Accounts, &sasGet.Body.GetResponse.Rval.Links, nil
+	return &sasGet.Body.GetResponse.Rval.Entries, &sasGet.Body.GetResponse.Rval.Links, nil
 }
 

@@ -13,7 +13,7 @@ var version = "v201206"
 
 type Adwords struct {
 	CampaignService          campaignService
-	ServicedAccountService   servicedAccountService
+	ManagedCustomerService   managedCustomerService
 	AdgroupCriterionService  adgroupCriterionService
 	AdgroupService           adgroupService
 	ConversionTrackerService conversionTrackerService
@@ -25,19 +25,19 @@ type Adwords struct {
 func New(auth adx.Auth) *Adwords {
 	auth.Version = version
 	conn := adx.Conn{Auth:auth, Token:adx.Authenticate(auth.Email, auth.Password)}
+	if auth.Sandbox {
+		conn.SandboxUrl = "-sandbox"
+	}
+	
 	adwords := Adwords{
 		CampaignService:          campaignService(conn),
-		ServicedAccountService:   servicedAccountService(conn),
+		ManagedCustomerService:   managedCustomerService(conn),
 		AdgroupCriterionService:  adgroupCriterionService(conn),
 		AdgroupService:           adgroupService(conn),
 		ConversionTrackerService: conversionTrackerService(conn),
 		UserListService:          userListService(conn),
 		ConstantDataService:      constantDataService(conn),
 		BulkMutateJobService:     bulkMutateJobService(conn),
-	}
-	
-	if auth.Sandbox {
-		conn.SandboxUrl = "-sandbox"
 	}
 	
 	return &adwords

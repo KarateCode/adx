@@ -2,8 +2,8 @@ package v201206
 
 import (
 	// "fmt"
-	"io"
-	"os"
+	// "io"
+	// "os"
 	"errors"
 	// "bytes"
 	// "io/ioutil"
@@ -73,8 +73,7 @@ func (self *adgroupService) Get(v AdgroupSelector) (*AdgroupGet, error) {
 	if err != nil {return nil, err}
 	defer returnBody.Close()
 	
-	println("\n\n\n")
-	io.Copy(os.Stdout, returnBody)
+	// io.Copy(os.Stdout, returnBody)
 	
 	// ba, err := ioutil.ReadAll(returnBody)
 	// if err != nil { panic(err)}
