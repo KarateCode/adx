@@ -4,18 +4,23 @@ import (
 	"strings"
 	"bufio"
 	"net/url"
+	"io"
 	"os"
 	"net/http"
 	"text/template"
 	"bytes"
-	"io"
-	// "os"
 	"encoding/xml"
 )
 
 type Auth struct {
 	DeveloperToken, ClientId, Email, Password, Version, Type string
 	Sandbox bool
+}
+
+type ApiData struct{
+	Auth *Auth
+	AuthToken string
+	Body, Mcc, Operation string
 }
 
 var AdxPush Auth
@@ -62,7 +67,7 @@ func init() {
 var layout *template.Template
 var layoutString = `{{define "T"}}<?xml version="1.0" encoding="UTF-8"?>
 <env:Envelope 
-	xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:wsdl="https://adwords.google.com/api/adwords/cm/{{.Auth.Version}}" xmlns:env="http://schemas.xmlsoap.org/soap/envelope/">
 	<env:Header>
 		<wsdl:RequestHeader xmlns="https://adwords.google.com/api/adwords/cm/{{.Auth.Version}}">
@@ -79,15 +84,7 @@ var layoutString = `{{define "T"}}<?xml version="1.0" encoding="UTF-8"?>
 
 type Conn struct {
 	Auth
-	sandboxUrl string
-	CampaignService          campaignService
-	ServicedAccountService   servicedAccountService
-	AdgroupCriterionService  adgroupCriterionService
-	AdgroupService           adgroupService
-	ConversionTrackerService conversionTrackerService
-	UserListService          userListService
-	ConstantDataService      constantDataService
-	BulkMutateJobService     bulkMutateJobService
+	SandboxUrl string
 	Token string
 }
 
@@ -113,24 +110,6 @@ type Predicate struct {
 	Field string `xml:"field"`
 	Operator string `xml:"operator"`
 	Values []string `xml:"values"`
-}
-
-func New(auth Auth) (*Conn) {
-	conn := Conn{Auth:auth, Token:Authenticate(auth.Email, auth.Password)}
-	conn.CampaignService.conn          = &conn
-	conn.ServicedAccountService.conn   = &conn
-	conn.AdgroupCriterionService.conn  = &conn
-	conn.AdgroupService.conn           = &conn
-	conn.ConversionTrackerService.conn = &conn
-	conn.UserListService.conn          = &conn
-	conn.ConstantDataService.conn      = &conn
-	conn.BulkMutateJobService.conn     = &conn
-	
-	if auth.Sandbox {
-		conn.sandboxUrl = "-sandbox"
-	}
-	
-	return &conn
 }
 
 func Authenticate(email, password string) string {
@@ -181,12 +160,12 @@ func CallApi(v interface{}, conn *Conn, service string, operation string) (io.Re
 	// println(string(p) + "\n")
 	
 	buffer := bytes.NewBufferString("")
-	execErr := layout.ExecuteTemplate(buffer, "T", data{
-		Auth:       &conn.Auth, 
-		AuthToken:  conn.Token, 
-		Body:       string(p), 
-		// Body:       body, 
-		Mcc:        "cm", 
+	execErr := layout.ExecuteTemplate(buffer, "T", ApiData{
+		Auth:       &conn.Auth,
+		AuthToken:  conn.Token,
+		Body:       string(p),
+		// Body:       body,
+		Mcc:        "cm",
 		Operation:  operation,
 	})
 	if execErr != nil {
@@ -194,9 +173,8 @@ func CallApi(v interface{}, conn *Conn, service string, operation string) (io.Re
 	}
 
 	// io.Copy(os.Stdout, buffer)
-	// return nil, nil
 	
-	req, err := http.NewRequest("POST", "https://adwords" + conn.sandboxUrl + ".google.com/api/adwords/cm/" + conn.Version + "/" + service, buffer)
+	req, err := http.NewRequest("POST", "https://adwords" + conn.SandboxUrl + ".google.com/api/adwords/cm/" + conn.Version + "/" + service, buffer)
 	if err != nil {
 		return nil, err
 	}

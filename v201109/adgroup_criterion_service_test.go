@@ -1,4 +1,4 @@
-package adx
+package v201109
 
 import (
 	// "fmt"
@@ -6,21 +6,22 @@ import (
 	"time"
 	"strconv"
 	. "github.com/KarateCode/helpers"
+	"github.com/KarateCode/adx"
 )
 
 func TestGetAdgroupCriterion(*testing.T) {
-	adwords := New(AdxPull)
+	adwords := New(adx.AdxPull)
 	
 	data := AdgroupCriterionSelector{
 		Fields:   []string{"Id", "Status", "MaxCpm", "AdGroupName"}, 
 		
-		Predicates: []Predicate{
-			Predicate{
+		Predicates: []adx.Predicate{
+			adx.Predicate{
 				Field:    "AdGroupId", 
 				Operator: "IN", 
 				Values:   []string{"2765812624"},
 			},
-			Predicate{
+			adx.Predicate{
 				Field:    "Id", // It's a vertical ID
 				Operator: "IN", 
 				Values:   []string{"5012832132"}, 
@@ -41,7 +42,7 @@ func TestGetAdgroupCriterion(*testing.T) {
 }
 
 func TestSetMaxCpm(*testing.T) {
-	adwords := New(AdxPull)
+	adwords := New(adx.AdxPull)
 	
 	// Update placement
 	createData := AdgroupCriterionOperations{
@@ -77,13 +78,13 @@ func TestSetMaxCpm(*testing.T) {
 	data := AdgroupCriterionSelector{
 		Fields:   []string{"Id", "Status", "MaxCpm", "AdGroupName"}, 
 		
-		Predicates: []Predicate{
-			Predicate{
+		Predicates: []adx.Predicate{
+			adx.Predicate{
 				Field:    "AdGroupId", 
 				Operator: "IN", 
 				Values:   []string{"2765812624"},
 			},
-			Predicate{
+			adx.Predicate{
 				Field:    "Id", // It's a vertical ID
 				Operator: "IN", 
 				Values:   []string{"5012832132"}, 
@@ -106,7 +107,7 @@ func TestSetMaxCpm(*testing.T) {
 }
 
 func TestAddRemoveAdgroupCriterion(*testing.T) {
-	adwords := New(AdxPush)
+	adwords := New(adx.AdxPush)
 	adgroupName := `Sample Adgroup ` + time.Now().String()
 	var adcGet *AdgroupGet
 	var err error
@@ -115,13 +116,13 @@ func TestAddRemoveAdgroupCriterion(*testing.T) {
 	
 	getData := AdgroupSelector{
 		Fields:   []string{"Id", "Status", "MaxCpm", "AdGroupName"}, 
-		Predicates: []Predicate{
-			Predicate{
+		Predicates: []adx.Predicate{
+			adx.Predicate{
 				Field:    "CampaignId", 
 				Operator: "EQUALS", 
 				Values:   []string{"702011"},
 			},
-			Predicate{
+			adx.Predicate{
 				Field:    "Status", 
 				Operator: "NOT_IN", 
 				Values:   []string{"DELETED"},
@@ -212,13 +213,13 @@ func TestAddRemoveAdgroupCriterion(*testing.T) {
 	
 	data := AdgroupCriterionSelector{
 		Fields:   []string{"Id", "Status", "MaxCpm", "AdGroupName", "PlacementUrl"}, 
-		Predicates: []Predicate{
-			Predicate{
+		Predicates: []adx.Predicate{
+			adx.Predicate{
 				Field:    "AdGroupId", 
 				Operator: "IN", 
 				Values:   []string{strconv.FormatInt(adgroupId, 10)},
 			},
-			Predicate{
+			adx.Predicate{
 				Field:    "Status", 
 				Operator: "NOT_IN", 
 				Values:   []string{"DELETED"},

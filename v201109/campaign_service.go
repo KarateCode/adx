@@ -1,4 +1,4 @@
-package adx
+package v201109
 
 import (
 	// "text/template"
@@ -6,11 +6,47 @@ import (
 	"errors"
 	// "io"
 	// "os"
+	"github.com/KarateCode/adx"
 )
 
-type campaignService struct {
-	conn *Conn
+var version = "v201109"
+
+type Adwords struct {
+	CampaignService          campaignService
+	ServicedAccountService   servicedAccountService
+	AdgroupCriterionService  adgroupCriterionService
+	AdgroupService           adgroupService
+	ConversionTrackerService conversionTrackerService
+	UserListService          userListService
+	ConstantDataService      constantDataService
+	BulkMutateJobService     bulkMutateJobService
 }
+
+func New(auth adx.Auth) *Adwords {
+	auth.Version = version
+	conn := adx.Conn{Auth:auth, Token:adx.Authenticate(auth.Email, auth.Password)}
+	adwords := Adwords{
+		CampaignService:          campaignService(conn),
+		ServicedAccountService:   servicedAccountService(conn),
+		AdgroupCriterionService:  adgroupCriterionService(conn),
+		AdgroupService:           adgroupService(conn),
+		ConversionTrackerService: conversionTrackerService(conn),
+		UserListService:          userListService(conn),
+		ConstantDataService:      constantDataService(conn),
+		BulkMutateJobService:     bulkMutateJobService(conn),
+	}
+	
+	if auth.Sandbox {
+		conn.SandboxUrl = "-sandbox"
+	}
+	
+	return &adwords
+}
+
+type campaignService adx.Conn
+// type campaignService struct {
+// 	conn *Conn
+// }
 
 type CampaignGetSelector struct {
 	XMLName   xml.Name `xml:"serviceSelector"`
@@ -19,12 +55,6 @@ type CampaignGetSelector struct {
 	Field string `xml:"predicates>field"`
 	Operator string `xml:"predicates>operator"`
 	Values []string `xml:"predicates>values"`
-}
-
-type data struct{
-	Auth *Auth
-	AuthToken string
-	Body, Mcc, Operation string
 }
 
 type CampaignGet struct {
@@ -65,7 +95,7 @@ type CampaignGet struct {
 func (self *campaignService) Get(v CampaignGetSelector) (*CampaignGet, error) {
 	campaignGet := new(CampaignGet)
 	
-	returnBody, err := CallApi(v, self.conn, "CampaignService", "get")
+	returnBody, err := adx.CallApi(v, (*adx.Conn)(self), "CampaignService", "get")
 	if err != nil {return nil, err}
 	defer returnBody.Close()
 	
@@ -115,7 +145,7 @@ func (self *campaignService) Mutate(v CampaignMutateOperations) error {
 	// v.BiddingStrategy.Xsi = "http://www.w3.org/2001/XMLSchema-instance"
 	// v := servicedAccountServiceGet{EnablePaging:false, SubmanagersOnly:false}
 
-	returnBody, err := CallApi(v, self.conn, "CampaignService", "mutate")
+	returnBody, err := adx.CallApi(v, (*adx.Conn)(self), "CampaignService", "mutate")
 	if err != nil {return err}
 	defer returnBody.Close()
 	// io.Copy(os.Stdout, res.Body) // uncomment this to view http response. Found a 414 once

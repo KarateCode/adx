@@ -1,4 +1,4 @@
-package adx
+package v201109
 
 import (
 	"text/template"
@@ -7,11 +7,10 @@ import (
 	// "io"
 	// "os"
 	"net/http"
+	"github.com/KarateCode/adx"
 )
 
-type servicedAccountService struct {
-	conn *Conn
-}
+type servicedAccountService adx.Conn
 
 type ServicedAccountGetSelector struct {
 	XMLName   xml.Name `xml:"selector"`
@@ -83,7 +82,7 @@ func (self *servicedAccountService) Get(v ServicedAccountGetSelector) (*[]Accoun
 	}
 	
 	buffer := bytes.NewBufferString("")
-	execErr := tmp.ExecuteTemplate(buffer, "T", data{Auth:&self.conn.Auth, AuthToken:self.conn.Token, Body:string(p), Mcc:"mcm", Operation:"get"})
+	execErr := tmp.ExecuteTemplate(buffer, "T", adx.ApiData{Auth:&self.Auth, AuthToken:self.Token, Body:string(p), Mcc:"mcm", Operation:"get"})
 	if execErr != nil {
 		return nil, nil, execErr
 	}
@@ -93,16 +92,16 @@ func (self *servicedAccountService) Get(v ServicedAccountGetSelector) (*[]Accoun
 	
 	// service doesn't exist in v201206
 	req, err := http.NewRequest("POST", 
-		"https://adwords" + self.conn.sandboxUrl + ".google.com/api/adwords/mcm/v201109/ServicedAccountService", 
+		"https://adwords" + self.SandboxUrl + ".google.com/api/adwords/mcm/v201109/ServicedAccountService", 
 		buffer)
 	if err != nil {
 		return nil, nil, err
 	}
 	
 	req.Header.Add("Content-Type", "application/soap+xml") // VERY IMPORTANT. ADX wouldn't accept xml without it
-	req.Header.Add("Authorization", "GoogleLogin auth=" + self.conn.Token)
-	req.Header.Add("clientCustomerId", self.conn.Auth.ClientId)
-	req.Header.Add("developerToken", self.conn.Auth.DeveloperToken)
+	req.Header.Add("Authorization", "GoogleLogin auth=" + self.Token)
+	req.Header.Add("clientCustomerId", self.Auth.ClientId)
+	req.Header.Add("developerToken", self.Auth.DeveloperToken)
 	
 	res, err := http.DefaultClient.Do(req)  
 	if err != nil {

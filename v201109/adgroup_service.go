@@ -1,19 +1,18 @@
-package adx
+package v201109
 
 import (
 	// "fmt"
-	// "io"
-	// "os"
+	"io"
+	"os"
 	"errors"
 	// "bytes"
 	// "io/ioutil"
 	// "text/template"
 	"encoding/xml"
+	"github.com/KarateCode/adx"
 )
 
-type adgroupService struct {
-	conn *Conn
-}
+type adgroupService adx.Conn
 
 // type AdgroupPredicate struct {
 // 	Field string `xml:"field"`
@@ -28,9 +27,9 @@ type AdgroupSelector struct {
 	// Field string `xml:"predicates>field"`
 	// Operator string `xml:"predicates>operator"`
 	// Values []string `xml:"predicates>values"`
-	Predicates []Predicate `xml:"predicates"`
+	Predicates []adx.Predicate `xml:"predicates"`
 	// Ordering Ordering `xml:"ordering,omitempty"`
-	Ordering
+	adx.Ordering
 	StartIndex int `xml:"paging>startIndex"`
 	NumberResults int `xml:"paging>numberResults"`
 }
@@ -54,7 +53,7 @@ type AdgroupEntry struct {
 type AdgroupGet struct {
 	XMLName   xml.Name `xml:"Envelope"`
 	Body struct {
-		Fault Fault
+		Fault adx.Fault
 		XMLName   xml.Name
 		GetResponse struct {
 			// XMLName   xml.Name `xml:"getResponse"`
@@ -70,11 +69,12 @@ type AdgroupGet struct {
 func (self *adgroupService) Get(v AdgroupSelector) (*AdgroupGet, error) {
 	adgroupGet := new(AdgroupGet)
 	
-	returnBody, err := CallApi(v, self.conn, "AdGroupService", "get")
+	returnBody, err := adx.CallApi(v, (*adx.Conn)(self), "AdGroupService", "get")
 	if err != nil {return nil, err}
 	defer returnBody.Close()
 	
-	// io.Copy(os.Stdout, returnBody)
+	println("\n\n\n")
+	io.Copy(os.Stdout, returnBody)
 	
 	// ba, err := ioutil.ReadAll(returnBody)
 	// if err != nil { panic(err)}
@@ -111,9 +111,9 @@ func (self *adgroupService) Mutate(v AdgroupOperations) error {
 	// v.BiddingStrategy.Cm = "https://adwords.google.com/api/adwords/cm/" + self.conn.Version
 	// v.BiddingStrategy.Xsi = "http://www.w3.org/2001/XMLSchema-instance"	
 	// v := servicedAccountServiceGet{EnablePaging:false, SubmanagersOnly:false}
-	adgroupMutate := new(MutateResponse)
+	adgroupMutate := new(adx.MutateResponse)
 	
-	returnBody, err := CallApi(v, self.conn, "AdGroupService", "mutate")
+	returnBody, err := adx.CallApi(v, (*adx.Conn)(self), "AdGroupService", "mutate")
 	if err != nil {return err}
 	defer returnBody.Close()
 	

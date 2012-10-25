@@ -1,20 +1,21 @@
-package adx
+package v201109
 
 import (
 	// "fmt"
 	"testing"
 	"time"
 	. "github.com/KarateCode/helpers"
+	"github.com/KarateCode/adx"
 )
 
 func TestGetAdgroup(*testing.T) {
-	adwords := New(AdxPull)
+	adwords := New(adx.AdxPull)
 	
 	data := AdgroupSelector{
 		Fields:   []string{"Id", "Status", "MaxCpm", "AdGroupName"}, 
 		
-		Predicates: []Predicate{
-			Predicate{
+		Predicates: []adx.Predicate{
+			adx.Predicate{
 				Field:    "AdGroupId", 
 				Operator: "IN", 
 				Values:   []string{"2765812624"},
@@ -41,21 +42,21 @@ func TestGetAdgroup(*testing.T) {
 }
 
 func TestAddRemoveAdgroups(*testing.T) {
-	AdxPush.Version = "v201109"
-	adwords := New(AdxPush)
+	adx.AdxPush.Version = "v201109"
+	adwords := New(adx.AdxPush)
 	adgroupName := `Sample Adgroup ` + time.Now().String()
 	var adcGet *AdgroupGet
 	var err error
 	
 	getData := AdgroupSelector{
 		Fields:   []string{"Id", "Status", "MaxCpm", "AdGroupName"}, 
-		Predicates: []Predicate{
-			Predicate{
+		Predicates: []adx.Predicate{
+			adx.Predicate{
 				Field:    "CampaignId", 
 				Operator: "EQUALS", 
 				Values:   []string{"702011"},
 			},
-			Predicate{
+			adx.Predicate{
 				Field:    "Status", 
 				Operator: "NOT_IN", 
 				Values:   []string{"DELETED"},

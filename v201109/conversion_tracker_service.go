@@ -1,4 +1,4 @@
-package adx
+package v201109
 
 import (
 	// "fmt"
@@ -6,45 +6,49 @@ import (
 	"encoding/xml"
 	// "io"
 	// "os"
+	"github.com/KarateCode/adx"
 )
 
-type userListService struct {
-	conn *Conn
-}
+type conversionTrackerService adx.Conn
 
-type UserListSelector struct {
+type ConversionTrackerSelector struct {
 	XMLName   xml.Name `xml:"serviceSelector"`
 	Fields []string `xml:"fields"`
-	Predicates []Predicate `xml:"predicates"`
+	Predicates []adx.Predicate `xml:"predicates"`
 	// StartIndex int `xml:"paging>startIndex"`
 	// NumberResults int `xml:"paging>numberResults"`
 }
 
-type UserListEntry struct {
+type ConversionTrackerEntry struct {
 	Id int64 `xml:"id"`
 	Name string `xml:"name"`
+	Status string `xml:"status"`
+	Stats struct {
+		Network string `xml:"network"`
+		StatsType string `xml:"Stats.Type"`
+	} `xml:"stats"`
 }
 
-type UserListGet struct {
+type ConversionTrackerGet struct {
 	XMLName   xml.Name `xml:"Envelope"`
 	Body struct {
-		Fault Fault
+		Fault adx.Fault
 		XMLName   xml.Name
 		GetResponse struct {
 			// XMLName   xml.Name `xml:"getResponse"`
 			Rval struct {
 				// XMLName   xml.Name
 				TotalNumEntries int `xml:"totalNumEntries"`
-				Entries []UserListEntry `xml:"entries"`
+				Entries []ConversionTrackerEntry `xml:"entries"`
 			} `xml:"rval"`
 		} `xml:"getResponse"`
 	}
 }
 
-func (self *userListService) Get(v UserListSelector) (*UserListGet, error) {
-	dataGet := new(UserListGet)
+func (self *conversionTrackerService) Get(v ConversionTrackerSelector) (*ConversionTrackerGet, error) {
+	dataGet := new(ConversionTrackerGet)
 	
-	returnBody, err := CallApi(v, self.conn, "UserListService", "get")
+	returnBody, err := adx.CallApi(v, (*adx.Conn)(self), "ConversionTrackerService", "get")
 	if err != nil {return nil, err}
 	defer returnBody.Close()
 	

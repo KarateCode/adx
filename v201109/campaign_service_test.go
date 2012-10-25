@@ -1,13 +1,14 @@
-package adx
+package v201109
 
 import (
 	// "fmt"
 	"testing"
 	. "github.com/KarateCode/helpers"
+	"github.com/KarateCode/adx"
 )
 
 func TestGetCampaign(*testing.T) {
-	adwords := New(AdxPush)
+	adwords := New(adx.AdxPush)
 	
 	data := CampaignGetSelector{
 		Fields:   []string{"Id", "Name"}, 
