@@ -4,8 +4,8 @@ import (
 	"text/template"
 	"bytes"
 	"encoding/xml"
-	"io"
-	"os"
+	// "io"
+	// "os"
 	"net/http"
 	"github.com/KarateCode/adx"
 )
@@ -112,7 +112,7 @@ func (self *managedCustomerService) Get(v ManagedCustomerGetSelector) (*[]Entry,
 	}
 	defer res.Body.Close()
 	
-	io.Copy(os.Stdout, res.Body) // uncomment this to view http response. Found a 414 once
+	// io.Copy(os.Stdout, res.Body) // uncomment this to view http response. Found a 414 once
 	// return sasGet, nil
 	
 	decoder := xml.NewDecoder(res.Body)
