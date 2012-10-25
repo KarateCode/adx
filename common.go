@@ -174,6 +174,7 @@ func CallApi(v interface{}, conn *Conn, service string, operation string) (io.Re
 
 	// io.Copy(os.Stdout, buffer)
 	
+	println("https://adwords" + conn.SandboxUrl + ".google.com/api/adwords/cm/" + conn.Version + "/" + service)
 	req, err := http.NewRequest("POST", "https://adwords" + conn.SandboxUrl + ".google.com/api/adwords/cm/" + conn.Version + "/" + service, buffer)
 	if err != nil {
 		return nil, err
