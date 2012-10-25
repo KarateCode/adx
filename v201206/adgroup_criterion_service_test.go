@@ -54,7 +54,7 @@ func TestSetMaxCpm(*testing.T) {
 			Criterion: Criterion{
 				// Type: "VERTICAL", 
 				Id: 5012832132,
-				// Type: "Placement", 
+				XsiType: "Placement", 
 				// Url: "http://pluto.google.com",
 			},
 			UserStatus: "ACTIVE",
@@ -174,7 +174,7 @@ func TestAddRemoveAdgroupCriterion(*testing.T) {
 			AdgroupId: adgroupId,
 			// CriterionUse: "BIDDABLE",
 			Criterion: Criterion{
-				Type: "Placement", 
+				XsiType: "Placement", 
 				// Keyword: "Comics",
 				Url: "http://mars.google.com",
 				// MatchType: "EXACT",
@@ -198,7 +198,7 @@ func TestAddRemoveAdgroupCriterion(*testing.T) {
 			AdgroupId: adgroupId,
 			// CriterionUse: "BIDDABLE",
 			Criterion: Criterion{
-				Type: "Placement", 
+				XsiType: "Placement", 
 				// Keyword: "Comics",
 				Url: "http://pluto.google.com",
 				// MatchType: "EXACT",

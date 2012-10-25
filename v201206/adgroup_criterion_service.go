@@ -6,8 +6,8 @@ import (
 	"encoding/xml"
 	"strconv"
 	"errors"
-	"io"
-	"os"
+	// "io"
+	// "os"
 	"github.com/KarateCode/adx"
 )
 
@@ -54,7 +54,7 @@ type AdgroupCriterionGet struct {
 					Criterion struct {
 						Id int64 `xml:"id"`
 						Url string `xml:"url"`
-						Type string `xml:"type"`
+						XsiType string `xml:"type"`
 					} `xml:"criterion"`
 					UserStatus string `xml:"userStatus"`
 					// Bids Bids `xml:"bids,omitempty"`
@@ -120,7 +120,7 @@ type AdgroupCriterionOperand struct {
 
 type Criterion struct {
 	// Type string `xml:"type"`
-	Type   string `xml:"xsi:type,attr,omitempty"`
+	XsiType   string `xml:"xsi:type,attr,omitempty"`
 	// CriterionType string `xml:"Criterion.Type"`
 	Url string `xml:"url,omitempty"`
 	Id int64 `xml:"id,omitempty"`
@@ -161,7 +161,7 @@ func (self *adgroupCriterionService) Mutate(v AdgroupCriterionOperations) error 
 	if err != nil {return err}
 	defer returnBody.Close()
 	
-	io.Copy(os.Stdout, returnBody)
+	// io.Copy(os.Stdout, returnBody)
 	
 	decoder := xml.NewDecoder(returnBody)
 	err = decoder.Decode(adgroupMutate)
