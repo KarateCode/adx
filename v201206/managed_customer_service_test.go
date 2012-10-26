@@ -4,7 +4,6 @@ import (
 	// "fmt"
 	"testing"
 	. "github.com/KarateCode/helpers"
-	"github.com/KarateCode/adx"
 )
 
 func TestManagedCustomerGet(*testing.T) {
@@ -14,7 +13,7 @@ func TestManagedCustomerGet(*testing.T) {
 	var links *[]Link
 	var err error
 	
-	adxPush := adx.AdxPush
+	adxPush := AdxPush
 	adxPush.Version = "v201109"
 	adwords = New(adxPush)
 	// fmt.Printf("\nAdxPush%+v\n", AdxPush)
@@ -26,7 +25,7 @@ func TestManagedCustomerGet(*testing.T) {
 	ShouldEqual(6, len(*accounts))
 	ShouldEqual(5, len(*links))
 	
-	// adwords = New(adx.AdxPull)
+	// adwords = New(AdxPull)
 	// data = ManagedCustomerGetSelector{
 	// 	// Fields: []string{"name", "login"},
 	// 	Fields: []string{"Id", "Status", "MaxCpm", "AdGroupName"}, 

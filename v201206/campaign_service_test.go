@@ -4,11 +4,10 @@ import (
 	// "fmt"
 	"testing"
 	. "github.com/KarateCode/helpers"
-	"github.com/KarateCode/adx"
 )
 
 func TestGetCampaign(*testing.T) {
-	adwords := New(adx.AdxPush)
+	adwords := New(AdxPush)
 	
 	data := CampaignGetSelector{
 		Fields:   []string{"Id", "Name"}, 

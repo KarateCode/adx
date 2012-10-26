@@ -9,10 +9,9 @@ import (
 	// "io/ioutil"
 	// "text/template"
 	"encoding/xml"
-	"github.com/KarateCode/adx"
 )
 
-type adgroupService adx.Conn
+type adgroupService Conn
 
 // type AdgroupPredicate struct {
 // 	Field string `xml:"field"`
@@ -27,9 +26,9 @@ type AdgroupSelector struct {
 	// Field string `xml:"predicates>field"`
 	// Operator string `xml:"predicates>operator"`
 	// Values []string `xml:"predicates>values"`
-	Predicates []adx.Predicate `xml:"predicates"`
+	Predicates []Predicate `xml:"predicates"`
 	// Ordering Ordering `xml:"ordering,omitempty"`
-	adx.Ordering
+	Ordering
 	StartIndex int `xml:"paging>startIndex"`
 	NumberResults int `xml:"paging>numberResults"`
 }
@@ -53,7 +52,7 @@ type AdgroupEntry struct {
 type AdgroupGet struct {
 	XMLName   xml.Name `xml:"Envelope"`
 	Body struct {
-		Fault adx.Fault
+		Fault Fault
 		XMLName   xml.Name
 		GetResponse struct {
 			// XMLName   xml.Name `xml:"getResponse"`
@@ -69,7 +68,7 @@ type AdgroupGet struct {
 func (self *adgroupService) Get(v AdgroupSelector) (*AdgroupGet, error) {
 	adgroupGet := new(AdgroupGet)
 	
-	returnBody, err := adx.CallApi(v, (*adx.Conn)(self), "AdGroupService", "get")
+	returnBody, err := CallApi(v, (*Conn)(self), "AdGroupService", "get")
 	if err != nil {return nil, err}
 	defer returnBody.Close()
 	
@@ -110,9 +109,9 @@ func (self *adgroupService) Mutate(v AdgroupOperations) error {
 	// v.BiddingStrategy.Cm = "https://adwords.google.com/api/adwords/cm/" + self.conn.Version
 	// v.BiddingStrategy.Xsi = "http://www.w3.org/2001/XMLSchema-instance"	
 	// v := servicedAccountServiceGet{EnablePaging:false, SubmanagersOnly:false}
-	adgroupMutate := new(adx.MutateResponse)
+	adgroupMutate := new(MutateResponse)
 	
-	returnBody, err := adx.CallApi(v, (*adx.Conn)(self), "AdGroupService", "mutate")
+	returnBody, err := CallApi(v, (*Conn)(self), "AdGroupService", "mutate")
 	if err != nil {return err}
 	defer returnBody.Close()
 	

@@ -6,7 +6,6 @@ import (
 	"errors"
 	// "io"
 	// "os"
-	"github.com/KarateCode/adx"
 )
 
 var version = "v201206"
@@ -22,9 +21,9 @@ type Adwords struct {
 	BulkMutateJobService     bulkMutateJobService
 }
 
-func New(auth adx.Auth) *Adwords {
+func New(auth Auth) *Adwords {
 	auth.Version = version
-	conn := adx.Conn{Auth:auth, Token:adx.Authenticate(auth.Email, auth.Password)}
+	conn := Conn{Auth:auth, Token:Authenticate(auth.Email, auth.Password)}
 	if auth.Sandbox {
 		conn.SandboxUrl = "-sandbox"
 	}
@@ -43,7 +42,7 @@ func New(auth adx.Auth) *Adwords {
 	return &adwords
 }
 
-type campaignService adx.Conn
+type campaignService Conn
 // type campaignService struct {
 // 	conn *Conn
 // }
@@ -95,7 +94,7 @@ type CampaignGet struct {
 func (self *campaignService) Get(v CampaignGetSelector) (*CampaignGet, error) {
 	campaignGet := new(CampaignGet)
 	
-	returnBody, err := adx.CallApi(v, (*adx.Conn)(self), "CampaignService", "get")
+	returnBody, err := CallApi(v, (*Conn)(self), "CampaignService", "get")
 	if err != nil {return nil, err}
 	defer returnBody.Close()
 	
@@ -145,7 +144,7 @@ func (self *campaignService) Mutate(v CampaignMutateOperations) error {
 	// v.BiddingStrategy.Xsi = "http://www.w3.org/2001/XMLSchema-instance"
 	// v := servicedAccountServiceGet{EnablePaging:false, SubmanagersOnly:false}
 
-	returnBody, err := adx.CallApi(v, (*adx.Conn)(self), "CampaignService", "mutate")
+	returnBody, err := CallApi(v, (*Conn)(self), "CampaignService", "mutate")
 	if err != nil {return err}
 	defer returnBody.Close()
 	// io.Copy(os.Stdout, res.Body) // uncomment this to view http response. Found a 414 once

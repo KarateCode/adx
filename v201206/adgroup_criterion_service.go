@@ -8,10 +8,9 @@ import (
 	"errors"
 	// "io"
 	// "os"
-	"github.com/KarateCode/adx"
 )
 
-type adgroupCriterionService adx.Conn
+type adgroupCriterionService Conn
 
 type AdgroupCriterionSelector struct {
 	XMLName   xml.Name `xml:"serviceSelector"`
@@ -20,7 +19,7 @@ type AdgroupCriterionSelector struct {
 	// Field string `xml:"predicates>field"`
 	// Operator string `xml:"predicates>operator"`
 	// Values []string `xml:"predicates>values"`
-	Predicates []adx.Predicate `xml:"predicates"`
+	Predicates []Predicate `xml:"predicates"`
 	StartIndex int `xml:"paging>startIndex"`
 	NumberResults int `xml:"paging>numberResults"`
 }
@@ -78,7 +77,7 @@ func (self *adgroupCriterionService) Get(v AdgroupCriterionSelector) (*AdgroupCr
 	// println("\n\n* AdgroupCriterionServiceGet *")
 	adgroupGet := new(AdgroupCriterionGet)
 	
-	returnBody, err := adx.CallApi(v, (*adx.Conn)(self), "AdGroupCriterionService", "get")
+	returnBody, err := CallApi(v, (*Conn)(self), "AdGroupCriterionService", "get")
 	if err != nil {return nil, err}
 	defer returnBody.Close()
 	
@@ -151,13 +150,13 @@ func (self *adgroupCriterionService) Mutate(v AdgroupCriterionOperations) error 
 	// v.BiddingStrategy.Xsi = "http://www.w3.org/2001/XMLSchema-instance"
 	// v := servicedAccountServiceGet{EnablePaging:false, SubmanagersOnly:false}
 	// println("Where's my mutate?")
-	adgroupMutate := new(adx.MutateResponse)
+	adgroupMutate := new(MutateResponse)
 	
 	if v.Operand.Bids.MaxCpm != 0 {
 		v.Operand.InnerXmlBids = `<bids xsi:type="` + v.Operand.Bids.XsiType + `"><maxCpm><amount><microAmount>` + strconv.FormatInt(v.Operand.Bids.MaxCpm, 10) + `</microAmount></amount></maxCpm></bids>`
 	}
 	
-	returnBody, err := adx.CallApi(v, (*adx.Conn)(self), "AdGroupCriterionService", "mutate")
+	returnBody, err := CallApi(v, (*Conn)(self), "AdGroupCriterionService", "mutate")
 	if err != nil {return err}
 	defer returnBody.Close()
 	

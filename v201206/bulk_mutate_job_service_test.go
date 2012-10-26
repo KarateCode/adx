@@ -5,12 +5,11 @@ import (
 	"testing"
 	// "time"
 	. "github.com/KarateCode/helpers"
-	"github.com/KarateCode/adx"
 )
 
 func TestGetBulkMutateJob(*testing.T) {
 	// adwords := New(AdxPull)
-	adwords := New(adx.AdxPush)
+	adwords := New(AdxPush)
 	
 	data := BulkMutateJobSelector{
 		XsiType: "BulkMutateJobSelector",
@@ -27,7 +26,7 @@ func TestGetBulkMutateJob(*testing.T) {
 }
 
 func TestGetResultBulkMutateJob(*testing.T) {
-	adwords := New(adx.AdxPush)
+	adwords := New(AdxPush)
 	
 	data := BulkMutateJobSelector{
 		XsiType: "BulkMutateJobSelector",
@@ -51,7 +50,7 @@ func TestGetResultBulkMutateJob(*testing.T) {
 
 func TestAddRemoveBulkMutateJob(*testing.T) {
 	// AdxPush.Version = "v201109"
-	adwords := New(adx.AdxPush)
+	adwords := New(AdxPush)
 	// adgroupName := `Sample Adgroup ` + time.Now().String()
 	var adcGet *BulkMutateJobGet
 	// var err error

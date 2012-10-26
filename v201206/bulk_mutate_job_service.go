@@ -5,10 +5,9 @@ import (
 	// "io"; "os"
 	"errors"
 	"encoding/xml"
-	"github.com/KarateCode/adx"
 )
 
-type bulkMutateJobService adx.Conn
+type bulkMutateJobService Conn
 
 type BulkMutateJobSelector struct {
 	XMLName   xml.Name `xml:"selector"`
@@ -24,7 +23,7 @@ type BulkMutateJobSelector struct {
 type BulkMutateJobGet struct {
 	XMLName   xml.Name `xml:"Envelope"`
 	Body struct {
-		Fault adx.Fault
+		Fault Fault
 		XMLName   xml.Name
 		GetResponse struct {
 			// XMLName   xml.Name `xml:"getResponse"`
@@ -40,7 +39,7 @@ type BulkMutateJobGet struct {
 type BulkMutateJobGetResult struct {
 	XMLName   xml.Name `xml:"Envelope"`
 	Body struct {
-		Fault adx.Fault
+		Fault Fault
 		XMLName   xml.Name
 		GetResultResponse struct {
 			// XMLName   xml.Name `xml:"getResponse"`
@@ -73,7 +72,7 @@ type BulkMutateJobGetResult struct {
 func (self *bulkMutateJobService) Get(v BulkMutateJobSelector) (*BulkMutateJobGet, error) {
 	adgroupGet := new(BulkMutateJobGet)
 	
-	returnBody, err := adx.CallApi(v, (*adx.Conn)(self), "MutateJobService", "get")
+	returnBody, err := CallApi(v, (*Conn)(self), "MutateJobService", "get")
 	if err != nil {return nil, err}
 	defer returnBody.Close()
 	
@@ -98,7 +97,7 @@ func (self *bulkMutateJobService) Get(v BulkMutateJobSelector) (*BulkMutateJobGe
 func (self *bulkMutateJobService) GetResult(v BulkMutateJobSelector) (*BulkMutateJobGetResult, error) {
 	adgroupGet := new(BulkMutateJobGetResult)
 	
-	returnBody, err := adx.CallApi(v, (*adx.Conn)(self), "MutateJobService", "getResult")
+	returnBody, err := CallApi(v, (*Conn)(self), "MutateJobService", "getResult")
 	if err != nil {return nil, err}
 	defer returnBody.Close()
 	
@@ -150,7 +149,7 @@ type BulkMutateJobOperand struct {
 type BulkMutateJobResponse struct {
 	XMLName   xml.Name `xml:"Envelope"`
 	Body struct {
-		Fault adx.Fault
+		Fault Fault
 		MutateResponse struct {
 			Rval struct {
 				Id     int64  `xml:"id"`
@@ -163,7 +162,7 @@ type BulkMutateJobResponse struct {
 func (self *bulkMutateJobService) Mutate(v []*BulkMutateJobOperations) (*BulkMutateJobResponse, error) {
 	mutate := new(BulkMutateJobResponse)
 	
-	returnBody, err := adx.CallApi(v, (*adx.Conn)(self), "MutateJobService", "mutate")
+	returnBody, err := CallApi(v, (*Conn)(self), "MutateJobService", "mutate")
 	if err != nil {return nil, err}
 	defer returnBody.Close()
 	

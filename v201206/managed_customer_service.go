@@ -7,10 +7,9 @@ import (
 	// "io"
 	// "os"
 	"net/http"
-	"github.com/KarateCode/adx"
 )
 
-type managedCustomerService adx.Conn
+type managedCustomerService Conn
 
 type ManagedCustomerGetSelector struct {
 	XMLName   xml.Name `xml:"serviceSelector"`
@@ -85,7 +84,7 @@ func (self *managedCustomerService) Get(v ManagedCustomerGetSelector) (*[]Entry,
 	}
 	
 	buffer := bytes.NewBufferString("")
-	execErr := tmp.ExecuteTemplate(buffer, "T", adx.ApiData{Auth:&self.Auth, AuthToken:self.Token, Body:string(p), Mcc:"mcm", Operation:"get"})
+	execErr := tmp.ExecuteTemplate(buffer, "T", ApiData{Auth:&self.Auth, AuthToken:self.Token, Body:string(p), Mcc:"mcm", Operation:"get"})
 	if execErr != nil {
 		return nil, nil, execErr
 	}
@@ -93,7 +92,6 @@ func (self *managedCustomerService) Get(v ManagedCustomerGetSelector) (*[]Entry,
 	// io.Copy(os.Stdout, buffer)
 	// return nil, nil, nil
 	
-	println("https://adwords" + self.SandboxUrl + ".google.com/api/adwords/mcm/v201206/ManagedCustomerService")
 	req, err := http.NewRequest("POST", 
 		"https://adwords" + self.SandboxUrl + ".google.com/api/adwords/mcm/v201206/ManagedCustomerService", 
 		buffer)

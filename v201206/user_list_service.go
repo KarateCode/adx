@@ -6,15 +6,14 @@ import (
 	"encoding/xml"
 	// "io"
 	// "os"
-	"github.com/KarateCode/adx"
 )
 
-type userListService adx.Conn
+type userListService Conn
 
 type UserListSelector struct {
 	XMLName   xml.Name `xml:"serviceSelector"`
 	Fields []string `xml:"fields"`
-	Predicates []adx.Predicate `xml:"predicates"`
+	Predicates []Predicate `xml:"predicates"`
 	// StartIndex int `xml:"paging>startIndex"`
 	// NumberResults int `xml:"paging>numberResults"`
 }
@@ -27,7 +26,7 @@ type UserListEntry struct {
 type UserListGet struct {
 	XMLName   xml.Name `xml:"Envelope"`
 	Body struct {
-		Fault adx.Fault
+		Fault Fault
 		XMLName   xml.Name
 		GetResponse struct {
 			// XMLName   xml.Name `xml:"getResponse"`
@@ -43,7 +42,7 @@ type UserListGet struct {
 func (self *userListService) Get(v UserListSelector) (*UserListGet, error) {
 	dataGet := new(UserListGet)
 	
-	returnBody, err := adx.CallApi(v, (*adx.Conn)(self), "UserListService", "get")
+	returnBody, err := CallApi(v, (*Conn)(self), "UserListService", "get")
 	if err != nil {return nil, err}
 	defer returnBody.Close()
 	

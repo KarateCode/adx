@@ -6,10 +6,9 @@ import (
 	"encoding/xml"
 	// "io"
 	// "os"
-	"github.com/KarateCode/adx"
 )
 
-type constantDataService adx.Conn
+type constantDataService Conn
 
 // type ConstantDataSelector struct {
 // 	XMLName   xml.Name `xml:"serviceSelector"`
@@ -22,7 +21,7 @@ type constantDataService adx.Conn
 type ConstantDataGetVerticalCriterion struct {
 	XMLName   xml.Name `xml:"Envelope"`
 	Body struct {
-		Fault adx.Fault
+		Fault Fault
 		XMLName   xml.Name
 		GetVerticalCriterionResponse struct {
 			// XMLName   xml.Name `xml:"getResponse"`
@@ -40,7 +39,7 @@ type ConstantDataGetVerticalCriterion struct {
 func (self *constantDataService) GetVerticalCriterion() (*ConstantDataGetVerticalCriterion, error) {
 	dataGet := new(ConstantDataGetVerticalCriterion)
 	
-	returnBody, err := adx.CallApi(nil, (*adx.Conn)(self), "ConstantDataService", "getVerticalCriterion")
+	returnBody, err := CallApi(nil, (*Conn)(self), "ConstantDataService", "getVerticalCriterion")
 	if err != nil {return nil, err}
 	defer returnBody.Close()
 	
